@@ -1,2 +1,32 @@
 提供专业报告引言 正文 结尾 页眉 图片编号 页码
 PPT 不要有太多文字 给另一个什么都不知道的人能了解
+
+
+TD3/4 
+读数据 ✔
+
+做 OLS 回归 ✔
+
+计算 R² ✔
+
+画真实 vs 预测图 ✔
+
+做标准化系数 & VIF ✔
+
+
+TD5/6
+对区域销量做 ACP
+
+标准化 + PCA
+
+打印每个主成分解释的方差比例
+
+打印 loadings（可以用来写“哪个区域跟哪个主成分相关”）
+
+画三个图：
+
+Scree plot（选多少主成分合适）
+
+Correlation circle（看 NA/EU/JP/Other 在 PC1–PC2 上的方向与强度）
+
+Factor map（plan factoriel，游戏在 PC1–PC2 上的云图，按 Genre 上色，看 cluster）
