@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ========== 1) 读取数据 ==========
+# ========== 1) Lecture des données ==========
 df = pd.read_csv("vgsales.csv")
 
-# 统一列名（容错）
+# Normaliser les noms de colonnes (tolérance aux erreurs)
 df = df.rename(columns={
     "Other_Sale":"Other_Sales",
     "NA_Sale":"NA_Sales",
@@ -18,18 +18,18 @@ df = df.rename(columns={
 cols_regions = ["NA_Sales","EU_Sales","JP_Sales","Other_Sales"]
 target = "Global_Sales"
 
-# 转成数值并去缺失
+# Convertir en valeurs numériques et supprimer les valeurs manquantes
 for c in cols_regions + [target]:
     df[c] = pd.to_numeric(df[c], errors="coerce")
 df = df.dropna(subset=cols_regions+[target])
 
-# ========== 2) 计算均值 & 标准差（老师要求） ==========
+# ========== 2) Calcul des moyennes & écarts-types (exigence du professeur) ==========
 stats = df[[target] + cols_regions].agg(["mean","std"]).T
 stats.columns = ["Mean","Std"]
 print("\n=== Moyennes & Écarts-types ===")
 print(stats)
 
-# ========== 3) 全局 + 区域销量分布直方图（老师要求） ==========
+# ========== 3) Histogrammes de la distribution des ventes globales + régionales (exigence du professeur) ==========
 for col in [target] + cols_regions:
     plt.figure()
     plt.hist(df[col], bins=30)
@@ -38,7 +38,7 @@ for col in [target] + cols_regions:
     plt.title(f"Histogramme de {col}")
     plt.show()
 
-# ========== 4) 各 Genre 的全球销量均值柱状图（老师要求） ==========
+# ========== 4) Diagramme en barres des ventes globales moyennes par genre (exigence du professeur) ==========
 genre_mean = df.groupby("Genre")[target].mean().sort_values(ascending=False)
 
 plt.figure(figsize=(10,5))
