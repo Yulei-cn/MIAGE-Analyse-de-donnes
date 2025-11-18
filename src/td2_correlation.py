@@ -7,10 +7,10 @@ df = pd.read_csv("vgsales.csv")
 cols_regions = ["NA_Sales","EU_Sales","JP_Sales","Other_Sales"]
 target = "Global_Sales"
 
-# 只保留相关列，去掉缺失
+# Ne conserver que les colonnes pertinentes et supprimer les valeurs manquantes
 df2 = df[[target]+cols_regions].dropna().copy()
 
-corr_pearson = df2.corr()                 # 默认 method='pearson'
+corr_pearson = df2.corr()                 # par défaut method='pearson'
 print("=== Pearson correlation matrix ===")
 print(corr_pearson)
 
@@ -40,7 +40,7 @@ for c in cols_regions:
 def scatter_loglog(region_col):
     x = df2[region_col].to_numpy()
     y = df2[target].to_numpy()
-    # 只保留>0的点，避免 log(0)
+    # Ne conserver que les points > 0 pour éviter log(0)
     mask = (x>0) & (y>0)
     x, y = x[mask], y[mask]
 
@@ -62,6 +62,6 @@ def hexbin_plot(region_col, gridsize=40):
     plt.title(f"{region_col} vs {target} (hexbin)")
     plt.show()
 
-# 如有需要再跑：
+# À exécuter si nécessaire :
 # for c in cols_regions:
 #     hexbin_plot(c)
