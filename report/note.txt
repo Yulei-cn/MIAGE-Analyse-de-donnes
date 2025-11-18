@@ -1,32 +1,27 @@
-提供专业报告引言 正文 结尾 页眉 图片编号 页码
-PPT 不要有太多文字 给另一个什么都不知道的人能了解
+TD3 / TD4 (Régression linéaire)
+Lire et charger les données
+Effectuer une régression OLS (Ordinary Least Squares)
+Calculer le coefficient de détermination R²
+Tracer le graphique « valeurs réelles vs valeurs prédites »
+Calculer les coefficients standardisés et les indices VIF
 
+(pour vérifier la multicolinéarité entre les variables)
 
-TD3/4 
-读数据 ✔
+TD5 / TD6 (Analyse en composantes principales – ACP)
+Réaliser une ACP sur les ventes régionales
+Standardiser les données puis appliquer la PCA
+Afficher la proportion de variance expliquée par chaque composante
+Afficher les loadings (coefficients de corrélation entre variables et composantes)
 
-做 OLS 回归 ✔
+(à utiliser pour expliquer quelles régions sont liées à quelles composantes principales)
 
-计算 R² ✔
+Produire trois graphiques :
 
-画真实 vs 预测图 ✔
+Scree plot
+(pour déterminer combien de composantes principales conserver)
 
-做标准化系数 & VIF ✔
+Cercle des corrélations
+(pour visualiser la direction et la force de NA / EU / JP / Other sur le plan PC1–PC2)
 
-
-TD5/6
-对区域销量做 ACP
-
-标准化 + PCA
-
-打印每个主成分解释的方差比例
-
-打印 loadings（可以用来写“哪个区域跟哪个主成分相关”）
-
-画三个图：
-
-Scree plot（选多少主成分合适）
-
-Correlation circle（看 NA/EU/JP/Other 在 PC1–PC2 上的方向与强度）
-
-Factor map（plan factoriel，游戏在 PC1–PC2 上的云图，按 Genre 上色，看 cluster）
+Carte factorielle (factor map / plan factoriel)
+(projection des jeux sur PC1–PC2, colorés par genre pour observer des clusters)
