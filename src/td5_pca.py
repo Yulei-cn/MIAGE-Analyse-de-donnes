@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
-# =========== 0) 读取数据 ===========
+# =========== 0) Lecture des données ===========
 
-CSV_PATH = "vgsales.csv"   # 按需要修改路径
+CSV_PATH = "vgsales.csv"   # Modifier le chemin si nécessaire
 df = pd.read_csv(CSV_PATH)
 
-# 统一列名（与 TD1/TD2/TD3 保持一致，容错用）
+# Normaliser les noms de colonnes (cohérent avec TD1/TD2/TD3, utilisé pour la tolérance aux erreurs)
 df = df.rename(columns={
     "Other_Sale": "Other_Sales",
     "Global_Sale": "Global_Sales",
@@ -21,21 +21,21 @@ df = df.rename(columns={
 
 cols_regions = ["NA_Sales", "EU_Sales", "JP_Sales", "Other_Sales"]
 
-# 只保留地区销量 + Genre（用于上色），去掉缺失
+# Ne garder que les ventes par région + Genre (pour la couleur), et supprimer les valeurs manquantes
 for c in cols_regions + ["Genre"]:
     if c in df.columns:
         df[c] = pd.to_numeric(df[c], errors="coerce") if c != "Genre" else df[c]
 df_pca = df[cols_regions + ["Genre"]].dropna().copy()
 
-# =========== 1) 标准化 & PCA ===========
+# =========== 1) Standardisation & ACP ===========
 
 X = df_pca[cols_regions].to_numpy()
 scaler = StandardScaler()
 X_std = scaler.fit_transform(X)
 
-# 保留 4 个主成分（最多 = 变量个数）
+# Conserver 4 composantes principales (au maximum = nombre de variables)
 pca = PCA(n_components=4)
-Z = pca.fit_transform(X_std)      # Z: (n, 4) 投影坐标
+Z = pca.fit_transform(X_std)      # Z : (n, 4) coordonnées projetées
 
 expl_var = pca.explained_variance_ratio_
 cum_expl_var = np.cumsum(expl_var)
@@ -44,7 +44,7 @@ print("=== Variance expliquée par chaque composante ===")
 for i, v in enumerate(expl_var, start=1):
     print(f"PC{i}: {v:.3f} ({cum_expl_var[i-1]:.3f} cumulé)")
 
-# 载荷（每个主成分对原始变量的权重）
+# Charges (poids de chaque composante principale sur les variables d’origine)
 loadings = pd.DataFrame(
     pca.components_,
     columns=cols_regions,
@@ -53,7 +53,7 @@ loadings = pd.DataFrame(
 print("\n=== Loadings (poids des PC sur les ventes régionales) ===")
 print(loadings)
 
-# =========== 2) Scree plot（碎石图）==========
+# =========== 2) Scree plot (graphe des éboulis) ==========
 
 plt.figure(figsize=(5, 4))
 plt.plot(range(1, 5), expl_var, "o-", label="Variance expliquée")
@@ -66,19 +66,19 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
-# =========== 3) 圆圈图（correlation circle）PC1–PC2 ==========
+# =========== 3) Cercle de corrélation (correlation circle) PC1–PC2 ==========
 
-# 对标准化数据，变量与 PC 的相关 ≈ loadings * sqrt(eigenvalue)
-# 但做圆圈图通常直接用 loadings 的前两列即可（在[-1,1]附近）
+# Pour des données standardisées, la corrélation entre les variables et les PC ≈ loadings * sqrt(valeur propre)
+# Mais pour tracer le cercle de corrélation, on utilise généralement directement les deux premières colonnes des loadings (proches de [-1,1])
 pcs12 = pca.components_[0:2, :]          # (2, 4)
 coords_var = pcs12.T                     # (4, 2)
 
 plt.figure(figsize=(5, 5))
-# 画单位圆
+# Tracer le cercle unité
 angle = np.linspace(0, 2*np.pi, 200)
 plt.plot(np.cos(angle), np.sin(angle), "k--", linewidth=0.5)
 
-# 画变量向量
+# Tracer les vecteurs des variables
 for i, var in enumerate(cols_regions):
     x, y = coords_var[i, 0], coords_var[i, 1]
     plt.arrow(0, 0, x, y,
@@ -99,14 +99,14 @@ plt.show()
 
 # =========== 4) Plan factoriel (jeux projetés sur PC1–PC2) ==========
 
-# 为了图不太密集，可以只取前 N 个样本显示
-N_PLOT = 800    # 如果想全画，可以设为 df_pca.shape[0]
+# Pour éviter que le graphique soit trop chargé, on peut n’afficher que les N premiers échantillons
+N_PLOT = 800    # Si l’on veut tout tracer, on peut mettre df_pca.shape[0]
 Z2 = Z[:N_PLOT, 0:2]
 genres = df_pca["Genre"].astype(str).values[:N_PLOT]
 
-# 给前若干 Genre 编码上色（多了就会有很多颜色）
+# Attribuer des codes de couleur aux premiers Genres (s’il y en a trop, il y aura beaucoup de couleurs)
 unique_genres = pd.Series(genres).unique()
-# 限制最多 10 种颜色，其他归为 "Other"
+# Limiter à 10 couleurs au maximum, les autres sont regroupés dans "Other"
 max_colors = 10
 main_genres = unique_genres[:max_colors]
 color_map = {g: i for i, g in enumerate(main_genres)}
@@ -122,17 +122,18 @@ plt.xlabel("PC1")
 plt.ylabel("PC2")
 plt.title("Plan factoriel (ACP ventes régionales, coloré par Genre)")
 
-# 构造图例：显示前 max_colors 个 Genre
+# Construire la légende : afficher les max_colors premiers Genres
 handles, _ = scatter.legend_elements(num=max_colors+1)
 labels = list(main_genres) + ["Autres"]
 plt.legend(handles, labels, title="Genre", bbox_to_anchor=(1.05, 1), loc="upper left")
 plt.tight_layout()
 plt.show()
 
-# =========== 5) 小的文本总结提示（可用于写报告）===========
+# =========== 5) Petit aide-mémoire textuel (utile pour rédiger le rapport) ===========
 
 print("\n=== Interprétation rapide pour le rapport (à adapter dans le texte) ===")
-print("- PC1 带来的方差比例：", f"{expl_var[0]:.2%}",
-      " → 如果 loadings 中 NA/EU/JP/Other 在 PC1 上都是正且数值相近，可以解释为“全球销量维度 (marché global)”")
-print("- PC2 的 loadings 如果例如 NA/EU 为正，而 JP 为负，则可以视为“欧美 vs 日本”维度 (dynamiques régionales).")
-print("- 在 plan factoriel 中，靠原点的游戏销量整体小，远离原点的游戏是销量在某些区域极高或极低的‘极端游戏’。")
+print("- Proportion de variance apportée par PC1 :", f"{expl_var[0]:.2%}",
+      " → Si les loadings de NA/EU/JP/Other sur PC1 sont tous positifs et de valeurs proches, on peut l’interpréter comme un « axe des ventes globales (marché global) ».")
+print("- Si les loadings de PC2 sont par exemple positifs pour NA/EU mais négatifs pour JP, on peut l’interpréter comme un axe « Occident vs Japon » (dynamiques régionales).")
+print("- Sur le plan factoriel, les jeux proches de l’origine ont des ventes globalement faibles ; les jeux éloignés de l’origine sont des « jeux extrêmes » dont les ventes sont très élevées ou très basses dans certaines régions.")
+
